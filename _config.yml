@@ -1,0 +1,14 @@
+url: http://www.ericjperry.com
+name: Eric Perry
+description: "This is a personal blog encompassing topics from coding and work in general to personal ramblings"
+title: Code n' Stuff
+email: eric@ericjperry.com
+markdown: kramdown
+kramdown:
+  input: GFM
+
+highlighter: pygments
+exclude: ['README.md']
+github_username: ericjperry
+twitter_username: ericjamesperry
+logo_location: "/images/profile_picture-150x150.jpg"

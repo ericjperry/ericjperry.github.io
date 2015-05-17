@@ -1,0 +1,14 @@
+
+mainmenu:
+  home:
+    url: "/"
+    text: "Home"
+    icon_class: "fa-home"
+  aboutme:
+    url: "/about/"
+    text: "About Me"
+    icon_class: "fa-info-circle"
+  projects:
+    url: "/projects/"
+    text: "Projects"
+    icon_class: "fa-briefcase"

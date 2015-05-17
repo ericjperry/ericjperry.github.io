@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+    content="  This is a personal blog encompassing topics from coding and work in general to personal ramblings">
+  <title> Code n' Stuff </title>
+
+  <!-- stylesheets -->
+  <link media="all" href="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+  <link media="all" href="http://netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link media="all" rel="stylesheet" href="/assets/css/site.css">
+
+</head>
+
+
+<body>
+
+  <div class="container">
+    <header>
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">
+          <img src="/images/profile_picture-150x150.jpg"> <span class="name-holder">Code n' Stuff</span>
+        </a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="navbar">
+
+        <ul id="main-menu" class="nav navbar-nav navbar-right">
+
+          
+            <li><a href="/">
+              <i class="fa fa-home"></i> Home</a>
+            </li>
+          
+            <li><a href="/about/">
+              <i class="fa fa-info-circle"></i> About Me</a>
+            </li>
+          
+            <li><a href="/projects/">
+              <i class="fa fa-briefcase"></i> Projects</a>
+            </li>
+          
+
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+  </nav>
+
+</header>
+
+
+    <div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
+    
+      <div class="blog-short">
+        <h3><a href="/redis-message-queue/">Building a Message Queue in Redis</a></h3>
+		<div>
+		  <small>
+			<i class="fa fa-calendar"></i>
+			<time>
+        Sunday, December 15, 2013
+			</time>
+		  </small>
+         </div>
+		<div class="margin10">
+          <small>
+            <i class="fa fa-tag"></i>
+            
+          </small>
+        </div>
+        
+        <article class="excerpt"><p>A few months ago a co-worker sent me <a title="Redis Message Queue" href="http://davidmarquis.wordpress.com/2013/01/03/reliable-delivery-message-queues-with-redis/" target="_blank">this</a> blog post to give me a few ideas for a development message queue system that he wanted. We are planning on using <a title="Kafka" href="https://kafka.apache.org/" target="_blank">Kafka</a> in our production environment, but he wanted something lighter weight (no dependency on zookeeper, etc) so that devs working on our platform could bring up and develop against our message queue library quickly. I borrowed a few ideas from the linked post, but also changed the architecture a bit in order to tailor the system for our needs. This was also a learning exercise in Redis, which is a part of our stack that I wanted to become more familiar with.</p>
+
+</article>
+        <a class="pull-right marginBottom10" href="/redis-message-queue/">Read More</a>
+      </div>
+    
+      <div class="blog-short">
+        <h3><a href="/change-port-in-sbt-for-scalatra-app/">Change port in sbt for Scalatra app</a></h3>
+		<div>
+		  <small>
+			<i class="fa fa-calendar"></i>
+			<time>
+        Sunday, August 18, 2013
+			</time>
+		  </small>
+         </div>
+		<div class="margin10">
+          <small>
+            <i class="fa fa-tag"></i>
+            
+          </small>
+        </div>
+        
+        <article class="excerpt"><p>I&#8217;ve been diving into the Scala(tra) world as part of a new project at work, and I wanted to share a useful piece of information here that I had trouble finding on the Interwebs. My task involves running two different Scalatra apps that are talking to each other, so of course they need to run on different ports when bringing them up locally. I am using sbt as the build manager for this app, and my build settings are all contained in project/build.scala, but I couldn&#8217;t figure out where to put the port information. Alas, after I created a <strong>build.sbt</strong> file in the root folder for the app and added the port information everything worked out perfectly. The following line in build.sbt will set the container&#8217;s port to 3002 when running <code>./sbt container:start</code></p>
+
+</article>
+        <a class="pull-right marginBottom10" href="/change-port-in-sbt-for-scalatra-app/">Read More</a>
+      </div>
+    
+      <div class="blog-short">
+        <h3><a href="/learning-and-leveraging/">Learning and Leveraging Skills in a new Environment</a></h3>
+		<div>
+		  <small>
+			<i class="fa fa-calendar"></i>
+			<time>
+        Sunday, May 20, 2012
+			</time>
+		  </small>
+         </div>
+		<div class="margin10">
+          <small>
+            <i class="fa fa-tag"></i>
+            
+          </small>
+        </div>
+        
+        <article class="excerpt"><p>I&#8217;ve always been a proponent of learning by experience. The best way to get familiar with something new is to dive right in and try not to hurt yourself. It is for this reason that in my junior year of college, my team in our &#8220;weed out&#8221; design course (hilarious looking back at that as a weed-out course) chose Java and Eclipse as a platform for development. I didn&#8217;t really have any direction at that point in college, but knew that Java was used widely in the software engineering world, so better late than never to learn it.</p>
+
+</article>
+        <a class="pull-right marginBottom10" href="/learning-and-leveraging/">Read More</a>
+      </div>
+    
+      <div class="blog-short">
+        <h3><a href="/introduction/">Introduction</a></h3>
+		<div>
+		  <small>
+			<i class="fa fa-calendar"></i>
+			<time>
+        Saturday, April 28, 2012
+			</time>
+		  </small>
+         </div>
+		<div class="margin10">
+          <small>
+            <i class="fa fa-tag"></i>
+            
+          </small>
+        </div>
+        
+        <article class="excerpt"><p>Hey, everyone! Thanks for stopping by my blog. If you haven&#8217;t taken a look at the [About Me][1] page, well, then you have no idea what this blog is or who I am. In short, I&#8217;m just a software developer looking to share some ideas with anyone willing to listen. I&#8217;m going to try and keep this blog active and make sure I share some meaningful information as well as provide a bit of entertainment for anyone who stumbles in here.</p>
+
+</article>
+        <a class="pull-right marginBottom10" href="/introduction/">Read More</a>
+      </div>
+    
+  </div>
+</div>
+
+
+  </div>
+  
+
+<footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-offset-3 col-lg-6">
+            <div class="row">
+              <div class="col-xs-12 text-center">
+                <small>&copy; rifyll theme, 2014</small>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <!--<script src="/assets/js/prism.js"></script> -->
+  <script src="/assets/js/site.js"></script>
+
+</body>
+
+</html>

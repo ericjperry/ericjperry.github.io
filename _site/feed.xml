@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Code n' Stuff</title>
+    <description>This is a personal blog encompassing topics from coding and work in general to personal ramblings</description>
+    <link>http://www.ericjperry.com/</link>
+    <atom:link href="http://www.ericjperry.com/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Sun, 17 May 2015 17:55:15 -0400</pubDate>
+    <lastBuildDate>Sun, 17 May 2015 17:55:15 -0400</lastBuildDate>
+    <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Building a Message Queue in Redis</title>
+        <description>&lt;p&gt;A few months ago a co-worker sent me &lt;a title=&quot;Redis Message Queue&quot; href=&quot;http://davidmarquis.wordpress.com/2013/01/03/reliable-delivery-message-queues-with-redis/&quot; target=&quot;_blank&quot;&gt;this&lt;/a&gt; blog post to give me a few ideas for a development message queue system that he wanted. We are planning on using &lt;a title=&quot;Kafka&quot; href=&quot;https://kafka.apache.org/&quot; target=&quot;_blank&quot;&gt;Kafka&lt;/a&gt; in our production environment, but he wanted something lighter weight (no dependency on zookeeper, etc) so that devs working on our platform could bring up and develop against our message queue library quickly. I borrowed a few ideas from the linked post, but also changed the architecture a bit in order to tailor the system for our needs. This was also a learning exercise in Redis, which is a part of our stack that I wanted to become more familiar with.&lt;/p&gt;
+
+&lt;h2 id=&quot;requirements&quot;&gt;Requirements&lt;/h2&gt;
+
+&lt;p&gt;The following is a list of requirements for our development message queue system:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Concurrency&lt;/strong&gt; – the ability to read off queues from several different threads/processes without issue.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Topic Replay&lt;/strong&gt; – the ability to replay the entirety of a topic to a consumer.
+    &lt;ul&gt;
+      &lt;li&gt;EDIT: This functionality is less realistic than I originally presumed. The ability to replay live messages on a topic is more accurate. Kafka provides a mechanism for configuring the max amount of time to retain logged messages. A full replay of all historical messages from a topic would involve an outside system.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Language Agnostic&lt;/strong&gt; – the ability to provide APIs for a variety of languages.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;system-design&quot;&gt;System Design&lt;/h2&gt;
+
+&lt;p&gt;As I mentioned before, the groundwork for this system was already laid out for me by the linked blog post. I changed a few small details in order to comply with the above requirements.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot; wp-image-58 alignright&quot; alt=&quot;redismq&quot; src=&quot;/images/redismq-300x141.png&quot; width=&quot;400&quot; height=&quot;200&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To account for topic replay, each consumer/topic relationship is represented in Redis as a key with an integer value pointing at the last message that the consumer retrieved. Each message is stored under its own key containing the topic name and index of the message. Since this system is only being used on development machines with a few consumers, the throughput is fairly low. For this reason the TTL is not being set on each message, and if new consumers come into play, they will see the entire message queue from the beginning (since their index will begin at 0 on entry). If this system were to be used in a production environment, the expiration of each key would need to be set, as all keys are stored in memory.&lt;/p&gt;
+
+&lt;h2 id=&quot;sending-a-message&quot;&gt;Sending a Message&lt;/h2&gt;
+
+&lt;p&gt;Sending a message in this system is very simple. Each message is granted a new key in the format &lt;topic&gt;:messages:&lt;index&gt;. A transaction is used to ensure that if multiple threads/producers are pushing to the same topic, they do not inadvertently overwrite a single index.&lt;/index&gt;&lt;/topic&gt;&lt;/p&gt;
+
+&lt;p&gt;Incrementing in Redis is atomic, so a transaction may seem like overkill here. The reason behind this decision was that each time a message is placed into a queue, the nextIndex key should only be incremented if the message was placed into the queue without error. To ensure this extra bit of fault tolerance, we get the nextIndex from Redis and increment it locally. That incremented index is then used to create the key for the message being pushed. The nextIndex increment and message insert (using the locally incremented index value) are both performed in the same transaction to ensure that each operation completes without error. If they do not, then the process is repeated (with a configurable retry limit).&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;alignleft  wp-image-60&quot; alt=&quot;redismq-produce (1)&quot; src=&quot;/images/redismq-produce-1-300x116.png&quot; width=&quot;400&quot; height=&quot;155&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In an example scenario, for a topic foo with a nextIndex value of 3 (before sending a message), the nextIndex would be incremented to 4 locally. The message key would be foo:messages:4. Incrementing foo:nextIndex to 4, and setting foo:messages:4 with the given message would occur in one transaction.&lt;/p&gt;
+
+&lt;h2 id=&quot;consuming-messages&quot;&gt;Consuming Messages&lt;/h2&gt;
+
+&lt;p&gt;Each consumer is granted a key per topic that denotes the last index that was consumed from the topic. Again, a transaction and watches are used to ensure that all portions of the consumption are completed without error. The consumer key is incremented locally to determine if there is a message to consume (the incremented consumer key must be less than the nextIndex key for the producer of the topic). The key is then incremented in Redis, and the corresponding message is retrieved from the producer key which is composed from the topic and the nextIndex value for the consumer/topic.&lt;/p&gt;
+
+&lt;p&gt;If a consumer wishes to replay a topic, they can unsubscribe/re-subscribe to the topic which will reset their nextIndex value for that topic to 0. This will effectively replay all live messages on the topic for that consumer.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;alignleft  wp-image-62&quot; alt=&quot;redismq-consumer (1)&quot; src=&quot;/images/redismq-consumer-1-300x129.png&quot; width=&quot;400&quot; height=&quot;185&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In another example, consider a consumer with an ID of bar, and a topic called baz. The consumer last retrieved the message with ID 3 from the baz topic, and baz has messages up to the ID of 12. The consumer’s nextIndex key will be incremented locally, and the check for a new message from the topic will pass (4 &amp;lt; 12). The increment will then be executed (a watch was placed on the nextIndex key, so that if another thread incremented the index in the meantime, we would try again and get the correct message). If the increment succeeds without error, the message will be retrieved.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Redis was a treat to work with. It is very easy to pick up, and the set of capabilities out of the box is great for small projects that require inter-process communication and ease of use. I have also implemented a work queue system with Redis that was very quick to put together, without sacrificing any capability. I am hoping that my employer will open-source the code for this message queue, as it is a nice learning tool and it also has potential to become a production-ready queuing system.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 15 Dec 2013 00:00:00 -0500</pubDate>
+        <link>http://www.ericjperry.com/redis-message-queue/</link>
+        <guid isPermaLink="true">http://www.ericjperry.com/redis-message-queue/</guid>
+        
+        
+        <category>distributed computing</category>
+        
+        <category>message queue</category>
+        
+        <category>redis</category>
+        
+      </item>
+    
+      <item>
+        <title>Change port in sbt for Scalatra app</title>
+        <description>&lt;p&gt;I’ve been diving into the Scala(tra) world as part of a new project at work, and I wanted to share a useful piece of information here that I had trouble finding on the Interwebs. My task involves running two different Scalatra apps that are talking to each other, so of course they need to run on different ports when bringing them up locally. I am using sbt as the build manager for this app, and my build settings are all contained in project/build.scala, but I couldn’t figure out where to put the port information. Alas, after I created a &lt;strong&gt;build.sbt&lt;/strong&gt; file in the root folder for the app and added the port information everything worked out perfectly. The following line in build.sbt will set the container’s port to 3002 when running &lt;code&gt;./sbt container:start&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre class=&quot;brush: scala; title: ; notranslate&quot; title=&quot;&quot;&gt;port in container.Configuration := 3004
+&lt;/pre&gt;
+</description>
+        <pubDate>Sun, 18 Aug 2013 00:00:00 -0400</pubDate>
+        <link>http://www.ericjperry.com/change-port-in-sbt-for-scalatra-app/</link>
+        <guid isPermaLink="true">http://www.ericjperry.com/change-port-in-sbt-for-scalatra-app/</guid>
+        
+        
+        <category>uncategorized</category>
+        
+      </item>
+    
+      <item>
+        <title>Learning and Leveraging Skills in a new Environment</title>
+        <description>&lt;p&gt;I’ve always been a proponent of learning by experience. The best way to get familiar with something new is to dive right in and try not to hurt yourself. It is for this reason that in my junior year of college, my team in our “weed out” design course (hilarious looking back at that as a weed-out course) chose Java and Eclipse as a platform for development. I didn’t really have any direction at that point in college, but knew that Java was used widely in the software engineering world, so better late than never to learn it.&lt;/p&gt;
+
+&lt;p&gt;The project ended up working *alright, *and I definitely came away with a greater understanding of the language as a whole and the tools necessary to succeed with it. The project opened my eyes to a new world of abstraction, which became a buzzword in my circle of friends, and led me to eventually (after some formal Java instruction) get a position as a Co-Op developing web tools in Grails.&lt;/p&gt;
+
+&lt;p&gt;I’m now embarking on a new journey that involves a similar goal: enhance a skill set through exploration and experimentation. I was contacted by a couple of close friends several months ago interested in developing a mobile app. They were looking for a developer to help out and experience the glitz and glam of the startup scene, and apparently I was the best they could find. The offer was tantalizing, zero dollars in exchange for a ton of work, so obviously I couldn’t refuse. What has followed has been a fun, and sometimes stressful, experience which I believe has made me a better person and strengthened my creativity. Let me share my lessons learned up to this point, and hopefully they will help provide a little inspiration and/or motivation to you!&lt;/p&gt;
+
+&lt;p&gt;Being part of a three man team on a quest for world domination in the realm of mobile social trivia apps has been quite a ride. Having part ownership in something is incredibly satisfying, and I would recommend to EVERYONE to at least attempt to build an idea of their own. This is a new experience for me and even if this app, company, my friendships, and my life crash and burn it will be a memory that I cherish. One of the most important things I’ve learned along the way is to keep the excitement in line. I find myself up in the wee hours of the morning staring at StackOverflow because I know I’m minutes (read: hours) away from a solution to a problem, and all that ends up doing is frustrating me and causing a terrible morning at work the following day. Startups and projects are all about time and resource management.&lt;/p&gt;
+
+&lt;p&gt;The first thing I’ve learned to do is create lists and charts for tasks that need to be accomplished. This is probably a no-brainer for everyone who has ever been involved in any project, but with no mentoring and a ton of excitement it’s easy to get caught up in bad behavior. At my full time position we have a very strict task distribution process, and I’ve tried to adopt some of that methodology into our slightly informal process over at Quaffic. I typically write down or make note of the next few tasks I need to accomplish and partition my time accordingly. Our team also maintains a feature list and development plan which is a guide for myself and &lt;a href=&quot;http://www.gregloesch.com&quot; title=&quot;Greg&quot;&gt;Greg&lt;/a&gt; on what tasks need to be accomplished. It also serves as a great motivator; knowing the deadlines and necessities for a project will push the developers to work smart and efficiently. Just kidding, a lot of times deadlines become stressful and cause a development team to make poor decisions or throw things like quality to the wayside. This issue brings me to my second point, which is to communicate any and all opinions, suggestions, questions, and information in general to the team.&lt;/p&gt;
+
+&lt;p&gt;It’s always difficult to admit that a deadline cannot be met, or that a requirement is becoming a productivity drag. These points always, ALWAYS need to be communicated to the team, both to report status and discuss next steps (moving deadlines, changing requirements for releases/sprints, etc.). It’s also important to speak up when it comes to suggestions or opinions even when it is outside of the realm of expertise. I learned about this fact the hard way during my first internship. I was told in my first exit review that I didn’t speak up enough. It was an eye opening statement for me since I normally consider myself to be pretty outgoing, but this was my first experience in an office environment. After this I took it upon myself to be vocal about any issue. For instance, I’m not a marketing specialist by any stretch of the imagination, but I do have opinions on what I like to see as a consumer. This personal experience gives my opinions and suggestions weight, and my team accepts them (but doesn’t always agree with them, which is okay). Holding in an idea benefits no one, while speaking the mind may propel a team.&lt;/p&gt;
+
+&lt;p&gt;Above all is to stay focused and keep your head up. A little positivity can go a long way. Insert another uplifting cliche here! Hope this post gives someone some motivation or a few ideas.&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 20 May 2012 00:00:00 -0400</pubDate>
+        <link>http://www.ericjperry.com/learning-and-leveraging/</link>
+        <guid isPermaLink="true">http://www.ericjperry.com/learning-and-leveraging/</guid>
+        
+        
+        <category>learning</category>
+        
+        <category>skills</category>
+        
+        <category>startup</category>
+        
+      </item>
+    
+      <item>
+        <title>Introduction</title>
+        <description>&lt;p&gt;Hey, everyone! Thanks for stopping by my blog. If you haven’t taken a look at the &lt;a href=&quot;/about&quot;&gt;About Me&lt;/a&gt; page, well, then you have no idea what this blog is or who I am. In short, I’m just a software developer looking to share some ideas with anyone willing to listen. I’m going to try and keep this blog active and make sure I share some meaningful information as well as provide a bit of entertainment for anyone who stumbles in here.&lt;/p&gt;
+
+&lt;p&gt;I’m going to start working on my first legitimate post soon and hopefully provide a better idea of the kind of content that can be found here. I’m going to work hard to make sure you find something you enjoy reading here, so make sure to stop back in.&lt;/p&gt;
+
+&lt;p&gt;If for some reason you want to see more of me, there are some links on the right panel with my Twitter/Facebook/LinkedIn/G+. See ya soon!&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 28 Apr 2012 00:00:00 -0400</pubDate>
+        <link>http://www.ericjperry.com/introduction/</link>
+        <guid isPermaLink="true">http://www.ericjperry.com/introduction/</guid>
+        
+        
+        <category>about</category>
+        
+        <category>intro</category>
+        
+      </item>
+    
+  </channel>
+</rss>
