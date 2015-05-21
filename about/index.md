@@ -4,7 +4,7 @@ author: eric
 layout: page
 ---
 <img src="../images/profile_picture.jpg" alt="What a cutie" title="headshot" width="203" height="184" class="alignleft size-full wp-image-19" style="display: block; margin-left: auto; margin-right: auto" />
-<h1 style="font-size:120%">
+<h1>
   Coder, nerd, Buckeye, Clevelander, DC Transplant, Entrepreneur
 </h1>
 
