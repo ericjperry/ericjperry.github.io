@@ -7,7 +7,7 @@ markdown: kramdown
 kramdown:
   input: GFM
 
-highlighter: pygments
+highlighter: rouge
 exclude: ['README.md']
 github_username: ericjperry
 twitter_username: ericjamesperry
