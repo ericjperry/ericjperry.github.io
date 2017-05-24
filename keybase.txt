@@ -1,0 +1,54 @@
+==================================================================
+https://keybase.io/eperry126
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://www.ericjperry.com
+  * I am eperry126 (https://keybase.io/eperry126) on keybase.
+  * I have a public key ASDzBiVGPpx2xUSVDPuPK25BgWjTiT-B7H2jTu8IR6mZQgo
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "0120f30625463e9c76c544950cfb8f2b6e418168d3893f81ec7da34eef0847a999420a",
+            "host": "keybase.io",
+            "kid": "0120f30625463e9c76c544950cfb8f2b6e418168d3893f81ec7da34eef0847a999420a",
+            "uid": "82375d924a7cc3f6b80e49fd1e80b619",
+            "username": "eperry126"
+        },
+        "service": {
+            "hostname": "www.ericjperry.com",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "client": {
+        "name": "keybase.io go client",
+        "version": "1.0.23"
+    },
+    "ctime": 1495665241,
+    "expire_in": 504576000,
+    "merkle_root": {
+        "ctime": 1495665171,
+        "hash": "cff8aba337cdc1b012534ea38dae295694da5aac54777295c339acbe9f870db7479e1d06dfd4b6ff933b0c6cfc1fea3271d6e2c223c118ef2274c2be0cba72e3",
+        "seqno": 1108198
+    },
+    "prev": "4e74bda879dd4e12cc5f21df5797f5dfd56498fc400ae9ee3b04cc5d70cbc67f",
+    "seqno": 11,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEg8wYlRj6cdsVElQz7jytuQYFo04k/gex9o07vCEepmUIKp3BheWxvYWTFAvx7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTIwZjMwNjI1NDYzZTljNzZjNTQ0OTUwY2ZiOGYyYjZlNDE4MTY4ZDM4OTNmODFlYzdkYTM0ZWVmMDg0N2E5OTk0MjBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwZjMwNjI1NDYzZTljNzZjNTQ0OTUwY2ZiOGYyYjZlNDE4MTY4ZDM4OTNmODFlYzdkYTM0ZWVmMDg0N2E5OTk0MjBhIiwidWlkIjoiODIzNzVkOTI0YTdjYzNmNmI4MGU0OWZkMWU4MGI2MTkiLCJ1c2VybmFtZSI6ImVwZXJyeTEyNiJ9LCJzZXJ2aWNlIjp7Imhvc3RuYW1lIjoid3d3LmVyaWNqcGVycnkuY29tIiwicHJvdG9jb2wiOiJodHRwOiJ9LCJ0eXBlIjoid2ViX3NlcnZpY2VfYmluZGluZyIsInZlcnNpb24iOjF9LCJjbGllbnQiOnsibmFtZSI6ImtleWJhc2UuaW8gZ28gY2xpZW50IiwidmVyc2lvbiI6IjEuMC4yMyJ9LCJjdGltZSI6MTQ5NTY2NTI0MSwiZXhwaXJlX2luIjo1MDQ1NzYwMDAsIm1lcmtsZV9yb290Ijp7ImN0aW1lIjoxNDk1NjY1MTcxLCJoYXNoIjoiY2ZmOGFiYTMzN2NkYzFiMDEyNTM0ZWEzOGRhZTI5NTY5NGRhNWFhYzU0Nzc3Mjk1YzMzOWFjYmU5Zjg3MGRiNzQ3OWUxZDA2ZGZkNGI2ZmY5MzNiMGM2Y2ZjMWZlYTMyNzFkNmUyYzIyM2MxMThlZjIyNzRjMmJlMGNiYTcyZTMiLCJzZXFubyI6MTEwODE5OH0sInByZXYiOiI0ZTc0YmRhODc5ZGQ0ZTEyY2M1ZjIxZGY1Nzk3ZjVkZmQ1NjQ5OGZjNDAwYWU5ZWUzYjA0Y2M1ZDcwY2JjNjdmIiwic2Vxbm8iOjExLCJ0YWciOiJzaWduYXR1cmUifaNzaWfEQAJmQIwgY0a45I3JJLVoSdAi7eOoWv10aIH1ykjZB6ptDSU/+4yPyj9vZcvXQysepe/sLToQ0/UVqdkyDfKoqwaoc2lnX3R5cGUgpGhhc2iCpHR5cGUIpXZhbHVlxCDYZssQVXEqNajrmeUiKN/q+3R/1J8I7mczJSWZmy1X7KN0YWfNAgKndmVyc2lvbgE=
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/eperry126
+
+==================================================================
